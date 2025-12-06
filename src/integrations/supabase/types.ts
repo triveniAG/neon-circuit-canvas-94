@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      circuit_components: {
+        Row: {
+          application: string
+          created_at: string
+          definition: string
+          id: string
+          image_url: string | null
+          name: string
+          symbol: string | null
+          why_used: string
+        }
+        Insert: {
+          application: string
+          created_at?: string
+          definition: string
+          id?: string
+          image_url?: string | null
+          name: string
+          symbol?: string | null
+          why_used: string
+        }
+        Update: {
+          application?: string
+          created_at?: string
+          definition?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          symbol?: string | null
+          why_used?: string
+        }
+        Relationships: []
+      }
+      scan_results: {
+        Row: {
+          created_at: string
+          detected_components: Json
+          id: string
+          image_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          detected_components?: Json
+          id?: string
+          image_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          detected_components?: Json
+          id?: string
+          image_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

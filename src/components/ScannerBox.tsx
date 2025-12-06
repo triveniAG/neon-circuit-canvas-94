@@ -1,5 +1,6 @@
 import { Upload, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const ScannerBox = () => {
   return (
@@ -34,23 +35,27 @@ const ScannerBox = () => {
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg"
-              className="group relative overflow-hidden bg-primary/20 hover:bg-primary/30 border border-primary/50 hover:border-primary text-primary hover:text-primary-foreground transition-all duration-300"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-              <Upload className="w-5 h-5 mr-2" />
-              <span className="relative z-10">Upload Image</span>
-            </Button>
+            <Link to="/scan">
+              <Button 
+                size="lg"
+                className="group relative overflow-hidden bg-primary/20 hover:bg-primary/30 border border-primary/50 hover:border-primary text-primary hover:text-primary-foreground transition-all duration-300 w-full"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                <Upload className="w-5 h-5 mr-2" />
+                <span className="relative z-10">Upload Image</span>
+              </Button>
+            </Link>
             
-            <Button 
-              size="lg"
-              className="group relative overflow-hidden bg-secondary/20 hover:bg-secondary/30 border border-secondary/50 hover:border-secondary text-secondary hover:text-secondary-foreground transition-all duration-300"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-secondary/0 via-secondary/20 to-secondary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-              <Camera className="w-5 h-5 mr-2" />
-              <span className="relative z-10">Use Scanner</span>
-            </Button>
+            <Link to="/scan">
+              <Button 
+                size="lg"
+                className="group relative overflow-hidden bg-secondary/20 hover:bg-secondary/30 border border-secondary/50 hover:border-secondary text-secondary hover:text-secondary-foreground transition-all duration-300 w-full"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary/0 via-secondary/20 to-secondary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                <Camera className="w-5 h-5 mr-2" />
+                <span className="relative z-10">Use Scanner</span>
+              </Button>
+            </Link>
           </div>
 
           {/* Helper Text */}

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown, Cpu, Database, Shield, Zap, Terminal, Settings, Users, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronDown, Scan, BookOpen, Home, Cpu, Info } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -10,35 +11,28 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: "Systems",
+    label: "Home",
+    href: "/",
+    icon: <Home className="w-4 h-4" />,
+  },
+  {
+    label: "Scanner",
+    href: "/scan",
+    icon: <Scan className="w-4 h-4" />,
+  },
+  {
+    label: "Library",
+    href: "/library",
+    icon: <BookOpen className="w-4 h-4" />,
+  },
+  {
+    label: "Resources",
     icon: <Cpu className="w-4 h-4" />,
     children: [
-      { label: "Core Processing", href: "#core", icon: <Cpu className="w-4 h-4" />, description: "Neural network hub" },
-      { label: "Data Matrix", href: "#matrix", icon: <Database className="w-4 h-4" />, description: "Storage clusters" },
-      { label: "Security Grid", href: "#security", icon: <Shield className="w-4 h-4" />, description: "Firewall systems" },
+      { label: "Component Library", href: "/library", icon: <BookOpen className="w-4 h-4" />, description: "Browse all components" },
+      { label: "Circuit Scanner", href: "/scan", icon: <Scan className="w-4 h-4" />, description: "Analyze circuits" },
+      { label: "About", href: "#about", icon: <Info className="w-4 h-4" />, description: "Learn more" },
     ],
-  },
-  {
-    label: "Modules",
-    icon: <Zap className="w-4 h-4" />,
-    children: [
-      { label: "Power Core", href: "#power", icon: <Zap className="w-4 h-4" />, description: "Energy management" },
-      { label: "Terminal Access", href: "#terminal", icon: <Terminal className="w-4 h-4" />, description: "Command interface" },
-      { label: "Diagnostics", href: "#diagnostics", icon: <Activity className="w-4 h-4" />, description: "System monitoring" },
-    ],
-  },
-  {
-    label: "Network",
-    icon: <Users className="w-4 h-4" />,
-    children: [
-      { label: "User Matrix", href: "#users", icon: <Users className="w-4 h-4" />, description: "Connected nodes" },
-      { label: "Configuration", href: "#config", icon: <Settings className="w-4 h-4" />, description: "System parameters" },
-    ],
-  },
-  {
-    label: "Status",
-    href: "#status",
-    icon: <Activity className="w-4 h-4" />,
   },
 ];
 
@@ -54,36 +48,66 @@ const CircuitNav = () => {
           onMouseEnter={() => item.children && setActiveDropdown(item.label)}
           onMouseLeave={() => setActiveDropdown(null)}
         >
-          {/* Nav Button */}
-          <button
-            className="group relative flex items-center gap-2 px-4 py-2 text-sm font-mono tracking-wider text-muted-foreground transition-all duration-300 hover:text-primary"
-          >
-            {/* Hover glow background */}
-            <div className="absolute inset-0 rounded-md bg-primary/0 group-hover:bg-primary/10 transition-all duration-300" />
-            
-            {/* Circuit trace left */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-transparent group-hover:w-2 transition-all duration-300" />
-            
-            <span className="relative z-10 flex items-center gap-2">
-              <span className="text-primary/50 group-hover:text-primary transition-colors duration-300">
-                {item.icon}
+          {/* Nav Button / Link */}
+          {item.href && !item.children ? (
+            <Link
+              to={item.href}
+              className="group relative flex items-center gap-2 px-4 py-2 text-sm font-mono tracking-wider text-muted-foreground transition-all duration-300 hover:text-primary"
+            >
+              {/* Hover glow background */}
+              <div className="absolute inset-0 rounded-md bg-primary/0 group-hover:bg-primary/10 transition-all duration-300" />
+              
+              {/* Circuit trace left */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-transparent group-hover:w-2 transition-all duration-300" />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                <span className="text-primary/50 group-hover:text-primary transition-colors duration-300">
+                  {item.icon}
+                </span>
+                {item.label}
               </span>
-              {item.label}
-              {item.children && (
-                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180 text-primary' : ''}`} />
-              )}
-            </span>
-            
-            {/* Circuit trace right */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-gradient-to-l from-secondary to-transparent group-hover:w-2 transition-all duration-300" />
-            
-            {/* Bottom indicator line */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gradient-to-r from-primary via-secondary to-primary group-hover:w-full transition-all duration-300" />
-            
-            {/* Corner nodes */}
-            <div className="absolute bottom-0 left-0 w-1 h-1 rounded-full bg-primary/0 group-hover:bg-primary transition-all duration-300" />
-            <div className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-secondary/0 group-hover:bg-secondary transition-all duration-300" />
-          </button>
+              
+              {/* Circuit trace right */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-gradient-to-l from-secondary to-transparent group-hover:w-2 transition-all duration-300" />
+              
+              {/* Bottom indicator line */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gradient-to-r from-primary via-secondary to-primary group-hover:w-full transition-all duration-300" />
+              
+              {/* Corner nodes */}
+              <div className="absolute bottom-0 left-0 w-1 h-1 rounded-full bg-primary/0 group-hover:bg-primary transition-all duration-300" />
+              <div className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-secondary/0 group-hover:bg-secondary transition-all duration-300" />
+            </Link>
+          ) : (
+            <button
+              className="group relative flex items-center gap-2 px-4 py-2 text-sm font-mono tracking-wider text-muted-foreground transition-all duration-300 hover:text-primary"
+            >
+              {/* Hover glow background */}
+              <div className="absolute inset-0 rounded-md bg-primary/0 group-hover:bg-primary/10 transition-all duration-300" />
+              
+              {/* Circuit trace left */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-transparent group-hover:w-2 transition-all duration-300" />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                <span className="text-primary/50 group-hover:text-primary transition-colors duration-300">
+                  {item.icon}
+                </span>
+                {item.label}
+                {item.children && (
+                  <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180 text-primary' : ''}`} />
+                )}
+              </span>
+              
+              {/* Circuit trace right */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-gradient-to-l from-secondary to-transparent group-hover:w-2 transition-all duration-300" />
+              
+              {/* Bottom indicator line */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gradient-to-r from-primary via-secondary to-primary group-hover:w-full transition-all duration-300" />
+              
+              {/* Corner nodes */}
+              <div className="absolute bottom-0 left-0 w-1 h-1 rounded-full bg-primary/0 group-hover:bg-primary transition-all duration-300" />
+              <div className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-secondary/0 group-hover:bg-secondary transition-all duration-300" />
+            </button>
+          )}
 
           {/* Dropdown Menu */}
           {item.children && (
@@ -109,9 +133,9 @@ const CircuitNav = () => {
                 {/* Dropdown items */}
                 <div className="relative z-10">
                   {item.children.map((child, index) => (
-                    <a
+                    <Link
                       key={child.label}
-                      href={child.href}
+                      to={child.href}
                       className="group/item relative flex items-start gap-3 px-4 py-3 transition-all duration-300 hover:bg-primary/10 rounded-md"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
@@ -142,7 +166,7 @@ const CircuitNav = () => {
                         <div className="w-1 h-1 rounded-full bg-secondary animate-pulse" style={{ animationDelay: '0.1s' }} />
                         <div className="w-1 h-1 rounded-full bg-secondary animate-pulse" style={{ animationDelay: '0.2s' }} />
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
 
