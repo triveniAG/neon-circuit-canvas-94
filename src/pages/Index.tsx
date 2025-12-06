@@ -1,6 +1,7 @@
 import CircuitBackground from "@/components/CircuitBackground";
 import CircuitHeader from "@/components/CircuitHeader";
-import HolographicPanel from "@/components/HolographicPanel";
+import ScannerBox from "@/components/ScannerBox";
+import StudentTestimonials from "@/components/StudentTestimonials";
 import CircuitFooter from "@/components/CircuitFooter";
 
 const Index = () => {
@@ -18,9 +19,13 @@ const Index = () => {
       {/* Header */}
       <CircuitHeader />
 
-      {/* Main Holographic Panel */}
-      <main className="flex-1 flex items-center justify-center relative z-10 py-8">
-        <HolographicPanel />
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center relative z-10 py-12 px-4 gap-16">
+        {/* Scanner Box */}
+        <ScannerBox />
+        
+        {/* Student Testimonials */}
+        <StudentTestimonials />
       </main>
 
       {/* Footer */}

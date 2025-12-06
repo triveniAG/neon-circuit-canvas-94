@@ -22,11 +22,11 @@ const CircuitFooter = () => {
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse-glow" />
-              <span className="tracking-widest">NEURAL INTERFACE v2.0.47</span>
+              <span className="tracking-widest">CIRCUIT VISION v1.0</span>
               <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse-glow" />
             </div>
-            <div className="text-xs text-muted-foreground/60 mt-1 tracking-wider">
-              © 2087 CYBERDYNE SYSTEMS
+            <div className="text-xs text-muted-foreground/80 mt-1 tracking-wider text-glow-subtle">
+              Created by Abhishek Adiga T R & Triveni A G
             </div>
           </div>
 
