@@ -8,7 +8,7 @@ import CircuitFooter from "@/components/CircuitFooter";
 import ImageCanvas from "@/components/ImageCanvas";
 import ComponentPopup from "@/components/ComponentPopup";
 import { DetectedComponent } from "@/types/detection";
-import { mockDetectComponents } from "@/utils/mockDetection";
+import { detectComponents } from "@/utils/detectComponents";
 import { Link } from "react-router-dom";
 
 const ScanPage = () => {
@@ -37,8 +37,8 @@ const ScanPage = () => {
     setImageUrl(url);
 
     try {
-      // Run mock detection (replace with API call in production)
-      const detectedComponents = await mockDetectComponents(file);
+      // Run Google Cloud Vision detection
+      const detectedComponents = await detectComponents(file);
       setComponents(detectedComponents);
 
       toast({
