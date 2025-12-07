@@ -10,6 +10,10 @@ export interface CircuitComponent {
   why_used: string;
   image_url: string | null;
   created_at: string;
+  category: string | null;
+  circuit_diagram_svg: string | null;
+  specifications: Record<string, string | string[]> | null;
+  common_values: string[] | null;
 }
 
 export const useCircuitComponents = () => {
