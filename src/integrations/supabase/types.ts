@@ -17,31 +17,43 @@ export type Database = {
       circuit_components: {
         Row: {
           application: string
+          category: string | null
+          circuit_diagram_svg: string | null
+          common_values: string[] | null
           created_at: string
           definition: string
           id: string
           image_url: string | null
           name: string
+          specifications: Json | null
           symbol: string | null
           why_used: string
         }
         Insert: {
           application: string
+          category?: string | null
+          circuit_diagram_svg?: string | null
+          common_values?: string[] | null
           created_at?: string
           definition: string
           id?: string
           image_url?: string | null
           name: string
+          specifications?: Json | null
           symbol?: string | null
           why_used: string
         }
         Update: {
           application?: string
+          category?: string | null
+          circuit_diagram_svg?: string | null
+          common_values?: string[] | null
           created_at?: string
           definition?: string
           id?: string
           image_url?: string | null
           name?: string
+          specifications?: Json | null
           symbol?: string | null
           why_used?: string
         }
