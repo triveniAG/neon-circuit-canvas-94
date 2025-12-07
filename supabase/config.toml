@@ -2,3 +2,6 @@ project_id = "skzmqfurdqiwtweclpjc"
 
 [functions.circuit-assistant]
 verify_jwt = false
+
+[functions.detect-components]
+verify_jwt = false
