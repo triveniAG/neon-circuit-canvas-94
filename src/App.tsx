@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import ScanPage from "./pages/ScanPage";
 import ComponentLibrary from "./pages/ComponentLibrary";
 import NotFound from "./pages/NotFound";
+import CircuitAssistant from "./components/CircuitAssistant";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CircuitAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

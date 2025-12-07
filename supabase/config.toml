@@ -1,1 +1,4 @@
 project_id = "skzmqfurdqiwtweclpjc"
+
+[functions.circuit-assistant]
+verify_jwt = false
