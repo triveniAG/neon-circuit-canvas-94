@@ -16,6 +16,9 @@ const categoryColors: Record<string, string> = {
   "Integrated Circuit": "bg-green-500/20 text-green-300 border-green-500/40",
   "Electromechanical": "bg-amber-500/20 text-amber-300 border-amber-500/40",
   "Protection": "bg-red-500/20 text-red-300 border-red-500/40",
+  "Sensor": "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
+  "Microcontroller": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+  "Display": "bg-pink-500/20 text-pink-300 border-pink-500/40",
 };
 
 const ComponentCard = ({
@@ -29,64 +32,64 @@ const ComponentCard = ({
 }) => {
   return (
     <div
-      className={`relative group transition-all duration-500 ${
+      className={`relative group transition-all duration-500 cursor-pointer ${
         isExpanded ? "col-span-1 md:col-span-2 lg:col-span-3" : ""
       }`}
+      onClick={onToggle}
     >
       {/* Glow effect on hover */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-xl blur opacity-0 group-hover:opacity-60 transition-opacity duration-300" />
 
-      <div className="relative glass-panel rounded-xl p-6 h-full border border-primary/20 hover:border-primary/40 transition-colors overflow-hidden">
-        {/* Header */}
-        <div className="flex items-start gap-4 mb-4">
-          {/* Circuit Diagram Preview */}
-          {component.circuit_diagram_svg ? (
-            <div className="w-16 h-16 rounded-lg bg-card/60 border border-primary/40 flex items-center justify-center shrink-0 p-2">
+      <div className="relative glass-panel rounded-xl p-5 h-full border border-primary/20 hover:border-primary/40 transition-colors overflow-hidden">
+        {/* Compact Header with Image */}
+        <div className="flex items-start gap-3 mb-3">
+          {/* Component Image/Symbol */}
+          <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+            {component.circuit_diagram_svg ? (
               <CircuitDiagram 
                 svgContent={component.circuit_diagram_svg} 
-                className="w-full h-full"
+                className="w-10 h-10"
               />
-            </div>
-          ) : (
-            <div className="w-16 h-16 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
-              <span className="text-2xl font-display text-primary">
+            ) : (
+              <span className="text-xl font-display text-primary font-bold">
                 {component.symbol || component.name.charAt(0)}
               </span>
-            </div>
-          )}
-          
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-display text-lg text-primary text-glow-subtle">
-                {component.name}
-              </h3>
-              {component.symbol && (
-                <span className="text-xs text-muted-foreground font-mono bg-muted/30 px-2 py-0.5 rounded">
-                  {component.symbol}
-                </span>
-              )}
-            </div>
-            {component.category && (
-              <Badge 
-                variant="outline" 
-                className={`mt-1 text-xs ${categoryColors[component.category] || "bg-muted/20 text-muted-foreground border-muted/40"}`}
-              >
-                {component.category}
-              </Badge>
             )}
           </div>
           
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle();
-            }}
-            className="shrink-0 text-muted-foreground hover:text-primary"
-          >
-            {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </Button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-display text-base font-semibold text-primary text-glow-subtle truncate">
+                {component.name}
+              </h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle();
+                }}
+                className="shrink-0 w-7 h-7 text-muted-foreground hover:text-primary"
+              >
+                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              {component.symbol && (
+                <span className="text-xs text-muted-foreground font-mono bg-muted/30 px-1.5 py-0.5 rounded">
+                  {component.symbol}
+                </span>
+              )}
+              {component.category && (
+                <Badge 
+                  variant="outline" 
+                  className={`text-xs py-0 ${categoryColors[component.category] || "bg-muted/20 text-muted-foreground border-muted/40"}`}
+                >
+                  {component.category}
+                </Badge>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Brief definition (always visible) */}
@@ -96,42 +99,43 @@ const ComponentCard = ({
 
         {/* Expanded content */}
         {isExpanded && (
-          <div className="mt-6 space-y-6 animate-fade-in">
-            {/* Large Circuit Diagram */}
+          <div className="mt-5 space-y-5 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            {/* Circuit Symbol Section */}
             {component.circuit_diagram_svg && (
-              <div className="bg-card/40 rounded-lg p-6 border border-primary/20">
-                <h4 className="text-sm font-display text-primary mb-4 flex items-center gap-2">
+              <div className="bg-card/40 rounded-lg p-4 border border-primary/20">
+                <h4 className="text-sm font-display text-primary mb-3 flex items-center gap-2">
                   <Cpu className="w-4 h-4" />
                   Circuit Symbol
                 </h4>
-                <div className="flex justify-center">
+                <div className="flex justify-center bg-background/50 rounded-lg p-4">
                   <CircuitDiagram 
                     svgContent={component.circuit_diagram_svg} 
-                    className="w-48 h-24"
+                    className="w-40 h-20"
                   />
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Applications & Why Used - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Applications */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-secondary font-display">
+              <div className="bg-secondary/10 rounded-lg p-4 border border-secondary/20">
+                <div className="flex items-center gap-2 text-sm text-secondary font-display mb-2">
                   <Zap className="w-4 h-4" />
                   <span>Applications</span>
                 </div>
-                <p className="text-sm text-foreground/90 leading-relaxed pl-6">
+                <p className="text-sm text-foreground/90 leading-relaxed">
                   {component.application}
                 </p>
               </div>
 
               {/* Why Used */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-accent font-display">
+              <div className="bg-accent/10 rounded-lg p-4 border border-accent/20">
+                <div className="flex items-center gap-2 text-sm text-accent font-display mb-2">
                   <Lightbulb className="w-4 h-4" />
-                  <span>Why It's Used</span>
+                  <span>Why It is Used</span>
                 </div>
-                <p className="text-sm text-foreground/90 leading-relaxed pl-6">
+                <p className="text-sm text-foreground/90 leading-relaxed">
                   {component.why_used}
                 </p>
               </div>
@@ -144,12 +148,12 @@ const ComponentCard = ({
                   <Settings className="w-4 h-4" />
                   Specifications
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {Object.entries(component.specifications).map(([key, value]) => (
-                    <div key={key} className="text-sm">
-                      <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
-                      <span className="ml-2 text-foreground">
-                        {Array.isArray(value) ? value.join(', ') : value}
+                    <div key={key} className="flex items-start text-sm bg-background/30 rounded px-2 py-1.5">
+                      <span className="text-muted-foreground capitalize shrink-0">{key.replace(/_/g, " ")}:</span>
+                      <span className="ml-2 text-foreground font-medium">
+                        {Array.isArray(value) ? value.join(", ") : String(value)}
                       </span>
                     </div>
                   ))}
@@ -162,9 +166,9 @@ const ComponentCard = ({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-primary font-display">
                   <Tag className="w-4 h-4" />
-                  <span>Common Values / Part Numbers</span>
+                  <span>Common Part Numbers</span>
                 </div>
-                <div className="flex flex-wrap gap-2 pl-6">
+                <div className="flex flex-wrap gap-2">
                   {component.common_values.map((value, idx) => (
                     <Badge 
                       key={idx} 
@@ -182,8 +186,9 @@ const ComponentCard = ({
 
         {/* Click hint */}
         {!isExpanded && (
-          <div className="absolute bottom-2 right-2 text-xs text-muted-foreground/50">
-            Click to expand
+          <div className="absolute bottom-2 right-2 text-xs text-muted-foreground/50 flex items-center gap-1">
+            <Info className="w-3 h-3" />
+            Click for details
           </div>
         )}
       </div>
