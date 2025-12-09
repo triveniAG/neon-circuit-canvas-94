@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, Scan, BookOpen, Home, Cpu, Info } from "lucide-react";
+import { ChevronDown, Scan, BookOpen, Home, Cpu, Info, Brain } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -26,11 +26,17 @@ const navItems: NavItem[] = [
     icon: <BookOpen className="w-4 h-4" />,
   },
   {
+    label: "Quiz",
+    href: "/quiz",
+    icon: <Brain className="w-4 h-4" />,
+  },
+  {
     label: "Resources",
     icon: <Cpu className="w-4 h-4" />,
     children: [
       { label: "Component Library", href: "/library", icon: <BookOpen className="w-4 h-4" />, description: "Browse all components" },
       { label: "Circuit Scanner", href: "/scan", icon: <Scan className="w-4 h-4" />, description: "Analyze circuits" },
+      { label: "Take Quiz", href: "/quiz", icon: <Brain className="w-4 h-4" />, description: "Test your knowledge" },
       { label: "About", href: "#about", icon: <Info className="w-4 h-4" />, description: "Learn more" },
     ],
   },

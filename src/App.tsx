@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ScanPage from "./pages/ScanPage";
 import ComponentLibrary from "./pages/ComponentLibrary";
+import QuizPage from "./pages/QuizPage";
 import NotFound from "./pages/NotFound";
 import CircuitAssistant from "./components/CircuitAssistant";
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/scan" element={<ScanPage />} />
           <Route path="/library" element={<ComponentLibrary />} />
+          <Route path="/quiz" element={<QuizPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
