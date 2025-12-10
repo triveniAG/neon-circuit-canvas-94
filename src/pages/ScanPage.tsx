@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Upload, Camera, ArrowLeft, Scan, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +7,7 @@ import CircuitHeader from "@/components/CircuitHeader";
 import CircuitFooter from "@/components/CircuitFooter";
 import ImageCanvas from "@/components/ImageCanvas";
 import ComponentPopup from "@/components/ComponentPopup";
+import CameraScanner from "@/components/CameraScanner";
 import { DetectedComponent } from "@/types/detection";
 import { detectComponents } from "@/utils/detectComponents";
 import { Link } from "react-router-dom";
@@ -16,8 +17,40 @@ const ScanPage = () => {
   const [components, setComponents] = useState<DetectedComponent[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<DetectedComponent | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Handle camera capture
+  const handleCameraCapture = useCallback(async (imageData: string) => {
+    setShowCamera(false);
+    setIsAnalyzing(true);
+    setSelectedComponent(null);
+    setImageUrl(imageData);
+
+    try {
+      // Convert base64 to blob for detection
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+      const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
+
+      const detectedComponents = await detectComponents(file);
+      setComponents(detectedComponents);
+
+      toast({
+        title: "Analysis Complete",
+        description: `Found ${detectedComponents.length} components in your circuit.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "Could not analyze the circuit image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }, [toast]);
 
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -158,12 +191,7 @@ const ScanPage = () => {
                       size="lg"
                       variant="outline"
                       className="group relative overflow-hidden bg-secondary/10 hover:bg-secondary/20 border border-secondary/50 hover:border-secondary text-secondary transition-all"
-                      onClick={() => {
-                        toast({
-                          title: "Camera Scanner",
-                          description: "Camera feature coming soon! Please upload an image for now.",
-                        });
-                      }}
+                      onClick={() => setShowCamera(true)}
                     >
                       <Camera className="w-5 h-5 mr-2" />
                       Use Camera
@@ -244,6 +272,18 @@ const ScanPage = () => {
           component={selectedComponent}
           onClose={() => setSelectedComponent(null)}
         />
+      )}
+
+      {/* Camera Scanner Modal */}
+      {showCamera && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
+          <div className="w-full max-w-4xl">
+            <CameraScanner
+              onCapture={handleCameraCapture}
+              onClose={() => setShowCamera(false)}
+            />
+          </div>
+        </div>
       )}
 
       <CircuitFooter />
