@@ -234,4 +234,10 @@
   .animate-rotate-slow {
     animation: rotate-slow 20s linear infinite;
   }
+
+  /* Desktop scale wrapper - forces desktop layout on mobile */
+  .desktop-scale-wrapper {
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
 }
