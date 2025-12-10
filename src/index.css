@@ -240,4 +240,23 @@
     width: 100%;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* AR Scanner animations */
+  @keyframes scan-flicker {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.3; }
+  }
+
+  @keyframes ar-pulse {
+    0%, 100% { 
+      box-shadow: 0 0 10px 2px hsl(var(--secondary) / 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 20px 4px hsl(var(--secondary) / 0.5);
+    }
+  }
+
+  .animate-ar-pulse {
+    animation: ar-pulse 1.5s ease-in-out infinite;
+  }
 }
