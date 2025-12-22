@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Camera, CameraOff, RotateCcw, Aperture, AlertTriangle, RefreshCw, ChevronDown, Crosshair, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCamera } from '@/hooks/useCamera';
 import { useDeviceMotion } from '@/hooks/useDeviceMotion';
 import AROverlay from './AROverlay';
 import CameraDevicePicker from './CameraDevicePicker';
+import { detectCircuitBoard as opencvDetect, initOpenCV, DetectedBoard } from '@/utils/opencvDetection';
 
 interface CameraScannerProps {
   onCapture: (imageData: string, region?: { x: number; y: number; width: number; height: number }) => void;
@@ -31,8 +32,19 @@ const CameraScanner = ({ onCapture, onClose }: CameraScannerProps) => {
   const { x: motionX, y: motionY, isSupported: hasGyro, requestPermission } = useDeviceMotion();
   
   const [showDevicePicker, setShowDevicePicker] = useState(false);
-  const [detectedRegion, setDetectedRegion] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [detectedRegion, setDetectedRegion] = useState<DetectedBoard | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [isOpenCVReady, setIsOpenCVReady] = useState(false);
+  const [continuousDetection, setContinuousDetection] = useState(false);
+  const detectionFrameRef = useRef<number | null>(null);
+
+  // Initialize OpenCV on mount
+  useEffect(() => {
+    initOpenCV().then(() => {
+      setIsOpenCVReady(true);
+      console.log('OpenCV ready for detection');
+    });
+  }, []);
 
   // Start camera on mount
   useEffect(() => {
@@ -47,33 +59,58 @@ const CameraScanner = ({ onCapture, onClose }: CameraScannerProps) => {
     }
   }, [hasGyro, requestPermission]);
 
-  // Mock circuit board detection (simulates OpenCV.js detection)
-  const detectCircuitBoard = useCallback(() => {
-    if (!videoRef.current) return;
+  // Continuous detection loop
+  useEffect(() => {
+    if (!continuousDetection || !isActive || !videoRef.current || !isOpenCVReady) {
+      return;
+    }
+
+    const runDetection = async () => {
+      if (!videoRef.current || !continuousDetection) return;
+      
+      try {
+        const result = await opencvDetect(videoRef.current);
+        if (result) {
+          setDetectedRegion(result);
+        }
+      } catch (err) {
+        console.error('Detection error:', err);
+      }
+
+      if (continuousDetection) {
+        detectionFrameRef.current = requestAnimationFrame(runDetection);
+      }
+    };
+
+    detectionFrameRef.current = requestAnimationFrame(runDetection);
+
+    return () => {
+      if (detectionFrameRef.current) {
+        cancelAnimationFrame(detectionFrameRef.current);
+      }
+    };
+  }, [continuousDetection, isActive, isOpenCVReady]);
+
+  // Single frame detection with OpenCV.js
+  const runSingleDetection = useCallback(async () => {
+    if (!videoRef.current || !isOpenCVReady) return;
 
     setIsScanning(true);
 
-    // Simulate detection delay
-    setTimeout(() => {
-      // Mock detection - in production, use OpenCV.js or similar
-      const video = videoRef.current;
-      if (!video) return;
-
-      const containerWidth = video.clientWidth;
-      const containerHeight = video.clientHeight;
-
-      // Simulate finding a rectangular region
-      const mockRegion = {
-        x: containerWidth * 0.15,
-        y: containerHeight * 0.2,
-        width: containerWidth * 0.7,
-        height: containerHeight * 0.6,
-      };
-
-      setDetectedRegion(mockRegion);
+    try {
+      const result = await opencvDetect(videoRef.current);
+      if (result) {
+        setDetectedRegion(result);
+      } else {
+        // No board detected
+        setDetectedRegion(null);
+      }
+    } catch (err) {
+      console.error('Detection error:', err);
+    } finally {
       setIsScanning(false);
-    }, 1500);
-  }, []);
+    }
+  }, [isOpenCVReady]);
 
   // Handle capture
   const handleCapture = useCallback(() => {
@@ -250,8 +287,21 @@ const CameraScanner = ({ onCapture, onClose }: CameraScannerProps) => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={detectCircuitBoard}
-                    disabled={isScanning}
+                    onClick={() => setContinuousDetection(!continuousDetection)}
+                    className={`backdrop-blur-sm border-secondary/30 ${
+                      continuousDetection 
+                        ? 'bg-secondary/40 text-secondary border-secondary' 
+                        : 'bg-secondary/10 text-secondary/70 hover:bg-secondary/20'
+                    }`}
+                  >
+                    <Zap className={`w-4 h-4 mr-2 ${continuousDetection ? 'animate-pulse' : ''}`} />
+                    {continuousDetection ? 'Auto' : 'Auto'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={runSingleDetection}
+                    disabled={isScanning || !isOpenCVReady}
                     className="bg-secondary/20 backdrop-blur-sm border-secondary/30 hover:bg-secondary/30 text-secondary"
                   >
                     {isScanning ? (
@@ -262,7 +312,7 @@ const CameraScanner = ({ onCapture, onClose }: CameraScannerProps) => {
                     ) : (
                       <>
                         <Crosshair className="w-4 h-4 mr-2" />
-                        Detect Board
+                        Detect
                       </>
                     )}
                   </Button>

@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
+interface DetectedBoard {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  contour?: number[][];
+  confidence?: number;
+}
+
 interface AROverlayProps {
   isScanning: boolean;
-  detectedRegion: { x: number; y: number; width: number; height: number } | null;
+  detectedRegion: DetectedBoard | null;
   onClearRegion: () => void;
 }
 
@@ -23,6 +32,18 @@ const AROverlay = ({ isScanning, detectedRegion, onClearRegion }: AROverlayProps
 
     return () => clearInterval(interval);
   }, [isScanning]);
+
+  // Generate SVG path from contour points
+  const getContourPath = (contour: number[][]): string => {
+    if (!contour || contour.length < 3) return '';
+    
+    const path = contour.map((point, index) => {
+      const command = index === 0 ? 'M' : 'L';
+      return `${command} ${point[0]} ${point[1]}`;
+    }).join(' ');
+    
+    return `${path} Z`;
+  };
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10">
@@ -70,58 +91,111 @@ const AROverlay = ({ isScanning, detectedRegion, onClearRegion }: AROverlayProps
 
       {/* Data Readout Effect */}
       <div className="absolute top-4 left-4 text-xs font-mono text-primary/60 space-y-1">
-        <div className="animate-pulse">CIRCUIT_SCAN v2.1</div>
+        <div className="animate-pulse">OPENCV_DETECT v4.10</div>
         <div>RES: 1280x720</div>
         <div className={isScanning ? 'animate-pulse text-secondary' : ''}>
-          STATUS: {isScanning ? 'SCANNING...' : detectedRegion ? 'BOARD DETECTED' : 'READY'}
+          STATUS: {isScanning ? 'ANALYZING...' : detectedRegion ? 'BOARD DETECTED' : 'READY'}
         </div>
+        {detectedRegion?.confidence && (
+          <div className="text-secondary">
+            CONF: {Math.round(detectedRegion.confidence * 100)}%
+          </div>
+        )}
       </div>
 
       {/* FPS Counter */}
       <div className="absolute top-4 right-4 text-xs font-mono text-primary/60">
         <div>30 FPS</div>
-        <div>LAT: 12ms</div>
+        <div>OPENCV.JS</div>
       </div>
 
-      {/* Detected Region Highlight */}
+      {/* Detected Region with Contour Polygon */}
       {detectedRegion && (
-        <div
-          className="absolute border-2 border-secondary rounded-lg pointer-events-auto"
-          style={{
-            left: detectedRegion.x,
-            top: detectedRegion.y,
-            width: detectedRegion.width,
-            height: detectedRegion.height,
-            boxShadow: '0 0 30px 8px hsl(var(--secondary) / 0.3), inset 0 0 30px 8px hsl(var(--secondary) / 0.1)',
-          }}
-        >
-          {/* Animated border effect */}
-          <div className="absolute inset-0 border border-secondary/50 rounded-lg animate-pulse" />
-          
-          {/* Corner markers */}
-          <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-secondary" />
-          <div className="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-secondary" />
-          <div className="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-secondary" />
-          <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-secondary" />
+        <>
+          {/* SVG overlay for contour polygon */}
+          {detectedRegion.contour && detectedRegion.contour.length >= 3 && (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              
+              {/* Outer glow */}
+              <path
+                d={getContourPath(detectedRegion.contour)}
+                fill="none"
+                stroke="hsl(var(--secondary))"
+                strokeWidth="4"
+                strokeLinejoin="round"
+                opacity="0.3"
+                filter="url(#glow)"
+              />
+              
+              {/* Main contour line */}
+              <path
+                d={getContourPath(detectedRegion.contour)}
+                fill="hsl(var(--secondary) / 0.1)"
+                stroke="hsl(var(--secondary))"
+                strokeWidth="2"
+                strokeLinejoin="round"
+                className="animate-pulse"
+              />
+              
+              {/* Corner dots */}
+              {detectedRegion.contour.map((point, index) => (
+                <circle
+                  key={index}
+                  cx={point[0]}
+                  cy={point[1]}
+                  r="6"
+                  fill="hsl(var(--secondary))"
+                  stroke="hsl(var(--background))"
+                  strokeWidth="2"
+                />
+              ))}
+            </svg>
+          )}
 
-          {/* Label */}
-          <div className="absolute -top-8 left-0 bg-secondary/90 text-secondary-foreground text-xs px-2 py-1 rounded font-mono">
-            CIRCUIT BOARD DETECTED
-          </div>
-
-          {/* Clear button */}
-          <button
-            onClick={onClearRegion}
-            className="absolute -top-3 -right-3 w-6 h-6 bg-secondary rounded-full flex items-center justify-center hover:bg-secondary/80 transition-colors"
+          {/* Bounding box overlay */}
+          <div
+            className="absolute border-2 border-secondary/50 rounded-lg pointer-events-auto"
+            style={{
+              left: detectedRegion.x,
+              top: detectedRegion.y,
+              width: detectedRegion.width,
+              height: detectedRegion.height,
+              boxShadow: '0 0 30px 8px hsl(var(--secondary) / 0.2), inset 0 0 30px 8px hsl(var(--secondary) / 0.05)',
+            }}
           >
-            <X className="w-3 h-3 text-secondary-foreground" />
-          </button>
+            {/* Label */}
+            <div className="absolute -top-8 left-0 bg-secondary/90 text-secondary-foreground text-xs px-2 py-1 rounded font-mono flex items-center gap-2">
+              <span>CIRCUIT BOARD</span>
+              {detectedRegion.confidence && (
+                <span className="opacity-70">
+                  {Math.round(detectedRegion.confidence * 100)}%
+                </span>
+              )}
+            </div>
 
-          {/* Dimension labels */}
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-mono text-secondary/80">
-            {Math.round(detectedRegion.width)}px × {Math.round(detectedRegion.height)}px
+            {/* Clear button */}
+            <button
+              onClick={onClearRegion}
+              className="absolute -top-3 -right-3 w-6 h-6 bg-secondary rounded-full flex items-center justify-center hover:bg-secondary/80 transition-colors"
+            >
+              <X className="w-3 h-3 text-secondary-foreground" />
+            </button>
+
+            {/* Dimension labels */}
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-mono text-secondary/80">
+              {Math.round(detectedRegion.width)}px × {Math.round(detectedRegion.height)}px
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Vignette effect */}
